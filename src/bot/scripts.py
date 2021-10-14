@@ -8,66 +8,109 @@ from dataclasses import dataclass
 class Coords:
     """Class to process arguments from console/terminal"""
 
-    def __init__(self, console_args):
-        pizzas = re.findall(r'\d+,\d+', console_args[1])
-        self.grid = [int(i) for i in console_args[0].split(',')]
-        self.coords = [tuple(map(int, pizza.split(','))) for pizza in pizzas]
+    def __init__(self, console_args: str):
+        """
+        Initialize grid size and delivery coordinates
+        :param console_args: string argument from console
+        """
 
-
-class ProcessDelivery:
-    """Class to deliver pizza"""
+        grid, points = self._validate_grid_size(console_args)
+        self.grid = grid
+        self.coords = points
 
     @staticmethod
-    def _add_action(route_solution: list, action: str, steps: int):
+    def _validate_input(argument: str) -> (tuple, tuple):
         """
-        Method adds action E or W or N or S to list of route solutions
-        :param route_solution: list of route solutions
-        :param action: route action E, W, N or S
-        :param steps: actions count
-        :return: list with new actions added
+        Input validation for grid and coordinates
+        :param argument: string argument from console
+        :return: processed strings into tuples
         """
 
-        for i in range(steps):
-            route_solution.append(action)
+        grid = re.findall(r'(\d+x\d+)', argument)[0]
+        points = re.findall(r'\((\d+,\d+)\)', argument)
 
-        return route_solution
+        if not grid:
+            raise ValueError("Enter a grid in format like 5x5")
+        if not points:
+            raise ValueError("Enter points in format like (1,2) (3,3)")
+
+        grid = tuple(map(int, grid.split('x')))
+        points = tuple(tuple(map(int, point.split(','))) for point in points)
+
+        return grid, points
 
     @classmethod
-    def _get_route(cls, current_coords: list, next_coords: list) -> str:
+    def _validate_grid_size(cls, argument: str) -> (tuple, tuple):
+        grid, points = cls._validate_input(argument)
+
+        for coordinates in points:
+            limit = any(size < point for size, point in zip(grid, coordinates))
+            if limit:
+                raise ValueError("Coordinates out of grid size")
+
+        return grid, points
+
+
+class DeliveryRoute:
+    """Class to get delivery route"""
+
+    @staticmethod
+    def _get_actions_list(coordinate1: int, coordinate2: int, action) -> list:
         """
-        Methods calculates route to the next point
-        :param current_coords: list of current coordinates
-        :param next_coords: list of next coordinates
-        :return: str with steps of route solution
+        Method creates actions list
+        :param coordinate1: current point
+        :param coordinate2: next point
+        :param action: action to add in list
+        :return: list of actions
+        """
+        steps_count = abs(coordinate1-coordinate2)
+        return [action for _ in range(steps_count)]
+
+    @classmethod
+    def get_delivery_route_solution(
+            cls, current_coordinates: list, next_coordinates: list
+    ) -> str:
+        """
+        Method calculates route to the next delivery point
+        :param current_coordinates: list of the current coordinates [1, 3]
+        :param next_coordinates: list of the next coordinates [5, 5]
+        :return: string with steps to the next delivery point
         """
 
-        x1, y1 = current_coords
-        x2, y2 = next_coords
+        x1, y1 = current_coordinates
+        x2, y2 = next_coordinates
 
-        route_solution = list()
+        action_x = 'E' if x1 < x2 else 'W'
+        action_y = 'N' if y1 < y2 else 'S'
 
-        route_solution = cls._add_action(
-            route_solution, 'E' if x1 < x2 else 'W', abs(x1 - x2)
-        )
-        route_solution = cls._add_action(
-            route_solution, 'N' if y1 < y2 else 's', abs(y1 - y2)
-        )
+        route_solution_x = cls._get_actions_list(x1, x2, action_x)
+        route_solution_y = cls._get_actions_list(y1, y2, action_y)
+
+        route_solution = route_solution_x + route_solution_y
         route_solution.append('D')
 
         return "".join(route_solution)
 
+
+class DeliverPizza:
+    """Class to deliver pizza"""
+
+    route = DeliveryRoute
+
     @classmethod
-    def calculate_route(cls, coords: list) -> str:
+    def get_delivery_route(cls, coords: list) -> str:
         """
-        Method to calculate route with coords
-        :param coords: list with x,y coords
+        Method to calculate route for bot to deliver pizza
+        :param coords: list of coordinates [x, y]
         :return: string with route solution
         """
 
         route = ''
-        current_coords = [0, 0]
+        current_coords = (0, 0)
         for next_coords in coords:
-            current_path = cls._get_route(current_coords, next_coords)
+            current_path = cls.route.get_delivery_route_solution(
+                current_coords, next_coords
+            )
             current_coords = next_coords
             route += current_path
 
@@ -75,5 +118,6 @@ class ProcessDelivery:
 
 
 if __name__ == '__main__':
-    data = Coords(sys.argv[1].split('|'))
-    route = ProcessDelivery.calculate_route(data.coords)
+    data = Coords(sys.argv[1])
+    route = DeliverPizza.get_delivery_route(data.coords)
+    print(route)
