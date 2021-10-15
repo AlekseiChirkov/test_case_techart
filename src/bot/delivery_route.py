@@ -15,7 +15,7 @@ class DeliveryRoute:
         return [action for _ in range(steps_count)]
 
     @classmethod
-    def get_delivery_route_solution(
+    def calculate_route_solution(
             cls, current_coordinates: list, next_coordinates: list
     ) -> str:
         """

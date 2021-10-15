@@ -1,4 +1,4 @@
-class InvalidValueError(Exception):
+class InvalidGroundValueError(Exception):
     """Class for exception raised on invalid value"""
 
     def __init__(self, message="Input value is invalid"):
@@ -8,10 +8,10 @@ class InvalidValueError(Exception):
         """
 
         self.message = message
-        super(InvalidValueError, self).__init__(self.message)
+        super(InvalidGroundValueError, self).__init__(self.message)
 
 
-class SizeLimitException(Exception):
+class GroundSizeLimitError(Exception):
     """Class for limit size exception"""
 
     def __init__(self, message="Invalid grid size"):
@@ -21,4 +21,4 @@ class SizeLimitException(Exception):
         """
 
         self.message = message
-        super(SizeLimitException, self).__init__(self.message)
+        super(GroundSizeLimitError, self).__init__(self.message)
