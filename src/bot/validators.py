@@ -41,9 +41,8 @@ class InputValidator:
         :return: tuples ground and points
         """
 
-        try:
-            ground = re.findall(r'(\d+x\d+)', obj)[0]
-        except IndexError:
+        ground = obj.split(" ", 1)[0]
+        if ground[1] != 'x':
             raise InvalidGroundValueError(
                 "Enter ground in format like 5x5"
             )
@@ -63,4 +62,3 @@ class InputValidator:
         cls.validate_ground_size(ground, points)
 
         return ground, points
-
