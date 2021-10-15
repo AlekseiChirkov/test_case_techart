@@ -7,17 +7,17 @@ class DeliveryMan:
     route = DeliveryRoute
 
     @classmethod
-    def show_route(cls, coords: tuple) -> str:
+    def get_route(cls, coords: tuple) -> str:
         """
         Method to calculate route for bot to deliver pizza
-        :param coords: tuple of coordinates [x, y]
+        :param coords: tuple of coordinates (x, y)
         :return: string with route solution
         """
 
         solution = ''
         current_coords = (0, 0)
         for next_coords in coords:
-            current_path = cls.route.calculate_route_solution(
+            current_path = cls.route.calculate_delivery_route(
                 current_coords, next_coords
             )
             current_coords = next_coords
@@ -25,12 +25,12 @@ class DeliveryMan:
 
         return solution
 
-    @staticmethod
-    def print_solution(solution: str) -> None:
+    @classmethod
+    def show_route(cls, coordinates: tuple) -> None:
         """
         Method print result of route solution in console
-        :param solution: string with route solution
+        :param coordinates: tuple with delivery data
         :return: None
         """
 
-        print(solution)
+        print(cls.get_route(coordinates))

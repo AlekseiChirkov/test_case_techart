@@ -4,7 +4,7 @@ from bot.processors import ProcessObjectDatatype
 from bot.exceptions import InvalidGroundValueError, GroundSizeLimitError
 
 
-class ValidateInputData:
+class InputValidator:
     """Class to validate input data"""
 
     @staticmethod
@@ -40,11 +40,12 @@ class ValidateInputData:
         :param obj: string with data
         :return: tuples ground and points
         """
+
         try:
             ground = re.findall(r'(\d+x\d+)', obj)[0]
         except IndexError:
             raise InvalidGroundValueError(
-                "Input value must starts in format like 5x5"
+                "Enter ground in format like 5x5"
             )
 
         points = re.findall(r'\((\d+, \d+)\)', obj)

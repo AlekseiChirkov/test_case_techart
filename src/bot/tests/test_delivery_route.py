@@ -33,9 +33,9 @@ class DeliveryRouteTests(TestCase):
         """
 
         route = DeliveryRoute()
-        solution1 = route.calculate_route_solution([0, 0], [1, 1])
-        solution2 = route.calculate_route_solution([0, 0], [3, 1])
-        solution3 = route.calculate_route_solution([1, 5], [3, 1])
+        solution1 = route.calculate_delivery_route([0, 0], [1, 1])
+        solution2 = route.calculate_delivery_route([0, 0], [3, 1])
+        solution3 = route.calculate_delivery_route([1, 5], [3, 1])
 
         self.assertEqual(solution1, "END")
         self.assertEqual(solution2, "EEEND")
