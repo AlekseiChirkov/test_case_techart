@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from bot.validators import ValidateInputData
+from bot.validators import InputValidator
 
 
 @dataclass
@@ -13,7 +13,7 @@ class Ground:
         :param console_args: string argument from console
         """
 
-        grid, points = ValidateInputData.validate_ground_data_input(
+        grid, points = InputValidator.validate_ground_data_input(
             console_args
         )
         self.grid = grid

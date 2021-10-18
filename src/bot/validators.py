@@ -4,11 +4,49 @@ from bot.processors import ProcessObjectDatatype
 from bot.exceptions import InvalidGroundValueError, GroundSizeLimitError
 
 
-class ValidateInputData:
+class InputValidator:
     """Class to validate input data"""
 
     @staticmethod
-    def validate_coordinates_input(points: tuple):
+    def _get_ground_data(obj: str) -> str:
+        """
+        Method getting string and returning ground size data
+        :param obj: string with ground and coordinates data
+        :return: string with ground size list "5x5"
+        """
+
+        ground = obj.split(" ", 1)[0]
+        if ground[1] != 'x':
+            raise InvalidGroundValueError(
+                "Enter ground in format like 5x5"
+            )
+
+        return ground
+
+    @staticmethod
+    def _get_coordinates_data(obj: str) -> list:
+        """
+        Method getting string and returning coordinates data
+        :param obj: string with ground and coordinates data
+        :return: list with coordinates like [(1, 2), (3, 3)]
+        """
+
+        points = re.findall(r'\((\d+, \d+)\)', obj)
+        if not points:
+            raise InvalidGroundValueError(
+                "Enter points in format like (1, 2) (4, 4)"
+            )
+
+        return points
+
+    @staticmethod
+    def validate_coordinates_input(points: tuple) -> None:
+        """
+        Method validate coordinates datatype
+        :param points: tuple with coordinates like ((1, 2), (3, 3))
+        :return: None
+        """
+
         for coordinate in points:
             if not isinstance(coordinate, tuple):
                 raise InvalidGroundValueError(
@@ -17,7 +55,13 @@ class ValidateInputData:
                 )
 
     @staticmethod
-    def validate_ground_input(ground: tuple):
+    def validate_ground_input(ground: tuple) -> None:
+        """
+        Method validate ground datatype
+        :param ground: tuple with ground size like (5, 5)
+        :return: None
+        """
+
         if not isinstance(ground, tuple):
             raise InvalidGroundValueError(
                 f"Object must be a tuple"
@@ -25,7 +69,15 @@ class ValidateInputData:
             )
 
     @staticmethod
-    def validate_ground_size(ground: tuple, points: tuple):
+    def validate_ground_size(ground: tuple, points: tuple) -> None:
+        """
+        Method validate ground size
+        (coordinates should not go beyond the ground)
+        :param ground: tuple with ground size like (5, 5)
+        :param points: tuple with coordinates like ((1, 2), (3, 3))
+        :return: None
+        """
+
         for coordinates in points:
             limit = any(
                 size < point for size, point in zip(ground, coordinates)
@@ -40,18 +92,9 @@ class ValidateInputData:
         :param obj: string with data
         :return: tuples ground and points
         """
-        try:
-            ground = re.findall(r'(\d+x\d+)', obj)[0]
-        except IndexError:
-            raise InvalidGroundValueError(
-                "Input value must starts in format like 5x5"
-            )
 
-        points = re.findall(r'\((\d+, \d+)\)', obj)
-        if not points:
-            raise InvalidGroundValueError(
-                "Enter points in format like (1, 2) (4, 4)"
-            )
+        ground = cls._get_ground_data(obj)
+        points = cls._get_coordinates_data(obj)
 
         ground, points = ProcessObjectDatatype.process_ground_data_to_tuples(
             ground, points
@@ -62,4 +105,3 @@ class ValidateInputData:
         cls.validate_ground_size(ground, points)
 
         return ground, points
-

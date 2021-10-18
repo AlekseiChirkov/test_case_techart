@@ -39,7 +39,7 @@ class ExceptionsTests(TestCase):
             Ground("5a5 (1, 1)")
         except InvalidGroundValueError as e:
             self.assertEqual(
-                e.message, "Input value must starts in format like 5x5"
+                e.message, "Enter ground in format like 5x5"
             )
 
         try:
